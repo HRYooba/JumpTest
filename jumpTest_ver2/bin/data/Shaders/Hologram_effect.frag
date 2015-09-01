@@ -11,9 +11,14 @@ void main() {
     vec4 col_disp = texture2DRect(u_composition, pos);
     
     if ( col_disp.a > 0.0 ) {
+        /*
         vec4 blue =  col_disp * vec4(0.0, 0.9, 1.0, 0.5) * vec4( max(u_random, 0.7) );
         vec4 stripe = blue * vec4(sin(pos.y * 0.8 - u_time * 0.3) * 0.5 + 1.0);
-        vec4 broad =  stripe * 3.0 + 0.25 * sin(pos.y * 0.1 - u_time * 0.307) ;
+        vec4 broad =  stripe * 3.0 + 0.25 * sin(pos.y * 0.1 - u_time * 0.307) ;*/
+        
+        vec4 blue =  col_disp * vec4(0.0, 0.9, 1.0, 0.5) * vec4( max(u_random, 0.7) );
+        vec4 stripe = blue * vec4(sin(u_resolution.x - pos.x * 0.8 - u_time * 0.3) * 0.5 + 1.0);
+        vec4 broad =  stripe * 3.0 + 0.25 * sin(u_resolution.x - pos.x * 0.1 - u_time * 0.307) ;
         
         vec4 color = broad;
         gl_FragColor = color;

@@ -7,16 +7,18 @@ BackImage::BackImage() {
 // setup
 void BackImage::setup() {
     // 読み込む画像の設定
-    img.loadImage("back.jpg");
-    jumpSE.loadSound("jump.mp3");
+    img.loadImage("Image/back.jpg");
+    // soundPlayer
+    jumpSE.loadSound("SE/jump.mp3");
+    fallSE.loadSound("SE/fall.mp3");
+    // 初期設定
     position = -img.height;
-    //init();
 }
 
 // 初期化
 void BackImage::init() {
-    speed = 70;
-    gravity = 2.0;
+    speed    = 70;
+    gravity  = 2.0;
     minSpeed = -80.0;
     moveFlag = false;
 }
@@ -27,9 +29,15 @@ void BackImage::copyFlag(bool flag) {
 }
 
 // ジャンプした時に呼ばれる関数
-void BackImage::jamping() {
+void BackImage::jamping(float intiSpeed) {
     init();
-    jumpSE.play();
+    speed = intiSpeed * OSC_SPEED;
+    if ( speed >= 100 ) {
+        speed = 100;
+    }
+    printf("initSpeed : ");
+    printf("%f\n", speed);
+    //jumpSE.play();
 }
 
 // update
@@ -67,8 +75,12 @@ void BackImage::stopper() {
 
 
 // draw
-void BackImage::draw(float x, float y) {
-    img.draw(x, y+position, ofGetWidth(), img.height);
+void BackImage::draw(float x, float y, bool displayF) {
+    if ( displayF ) {
+        img.draw(x, y+position, ofGetHeight(), img.height);
+    } else {
+        img.draw(x, y+position, ofGetWidth(), img.height);
+    }
 }
 
 BackImage::~BackImage() {

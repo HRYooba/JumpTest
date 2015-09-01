@@ -6,15 +6,15 @@ Charactor::Charactor() {
 }
 
 void Charactor::setup() {
-    img.loadImage("player.png");
+    img.loadImage("Image/player.png");
     init();
 }
 
 void Charactor::init() {
-    charaSpeed = 40;
+    charaSpeed   = 40;
     charaGravity = 2.0;
-    charaCount = 0;
-    charaPos = 0;
+    charaCount   = 0;
+    charaPos     = 0;
 }
 
 void Charactor::copyFlag(bool flag) {

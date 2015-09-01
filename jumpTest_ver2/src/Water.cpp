@@ -5,13 +5,13 @@ Water::Water() {
 }
 
 void Water::setup() {
-    waterWidth = 640;
+    waterWidth  = 640;
     waterHeight = 480;
-    border = 0;
-    waterLevel = 0;
-    moveFlag = false;
+    border      = 0;
+    waterLevel  = 0;
+    moveFlag    = false;
     
-    img.loadImage("bubble.png");
+    img.loadImage("Image/bubble.png");
     swell.load("", "Shaders/Swell.frag");
     fbo.allocate(waterWidth, waterHeight+100);
     camTex.allocate(waterWidth, waterHeight+100, GL_RGB);
@@ -99,9 +99,9 @@ void Water::bubbleUpdate() {
     // 泡の処理
     for ( int i=0; i<bubbles.size(); i++ ) {
         // 浮力
-        float size = bubbles[i].get()->getRadius();
-        float frequency = (7.0/size) * sin(ofGetFrameNum()/(float)size * PI);
-        ofVec2f pos = bubbles[i].get()->getPosition();
+        float size       = bubbles[i].get()->getRadius();
+        float frequency  = (7.0/size) * sin(ofGetFrameNum()/(float)size * PI);
+        ofVec2f pos      = bubbles[i].get()->getPosition();
         ofVec2f buoyancy = ofVec2f(bubbles[i].get()->getVelocity().x + frequency, -size * size);
         
         bubbles[i].get()->setVelocity(buoyancy);
@@ -196,7 +196,7 @@ void Water::draw() {
     //　泡の描写
     for (int i=0; i<bubbles.size(); i++) {
         ofVec2f pos = bubbles[i].get()->getPosition();
-        float size = bubbles[i].get()->getRadius();
+        float size  = bubbles[i].get()->getRadius();
         img.draw(pos, size*2, size*2);
     }
     

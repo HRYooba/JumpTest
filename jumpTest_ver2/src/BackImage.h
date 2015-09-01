@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ofMain.h"
+#define  OSC_SPEED 0.34
 
 class BackImage {
     
@@ -15,6 +16,7 @@ public:
     ofImage img; // 背景の画像
     //音
     ofSoundPlayer jumpSE; // ジャンプ音
+    ofSoundPlayer fallSE;
     
     //コンストラクタとデストラクタ
     BackImage();
@@ -23,9 +25,9 @@ public:
     void setup();
     void init();
     void copyFlag(bool flag);
-    void jamping();
+    void jamping(float initSpeed);
     void update();
-    void draw(float x, float y);
+    void draw(float x, float y, bool displayF);
     void goal();
     void stopper();
     

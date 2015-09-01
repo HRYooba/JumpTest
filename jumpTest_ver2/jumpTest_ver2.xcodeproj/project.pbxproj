@@ -206,6 +206,9 @@
 		80C3ADE6F054D328A726B4C6 /* b2Island.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = b2Island.h; path = ../../../addons/ofxBox2d/libs/Box2D/Dynamics/b2Island.h; sourceTree = SOURCE_ROOT; };
 		81967292BFC87A0144BD32C6 /* ofxOscSender.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = ofxOscSender.cpp; path = ../../../addons/ofxOsc/src/ofxOscSender.cpp; sourceTree = SOURCE_ROOT; };
 		84B1B4A3E366385F8EEECD61 /* b2WeldJoint.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = b2WeldJoint.cpp; path = ../../../addons/ofxBox2d/libs/Box2D/Dynamics/Joints/b2WeldJoint.cpp; sourceTree = SOURCE_ROOT; };
+		870A55B41B958EBD0079788B /* Invisible_effect.frag */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = Invisible_effect.frag; sourceTree = "<group>"; };
+		870A55B51B95A9FC0079788B /* Gray_effect.frag */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = Gray_effect.frag; sourceTree = "<group>"; };
+		870A55B61B95AEE30079788B /* Crayon_effect.frag */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = Crayon_effect.frag; sourceTree = "<group>"; };
 		8739A5091B9071C2008387AF /* BackImage.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BackImage.cpp; sourceTree = "<group>"; };
 		8739A50A1B9071C2008387AF /* BackImage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BackImage.h; sourceTree = "<group>"; };
 		8739A50B1B9071C2008387AF /* CamShader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CamShader.cpp; sourceTree = "<group>"; };
@@ -534,6 +537,9 @@
 				87916A651B91CEF3003210FD /* Echo_effect.frag */,
 				87916A671B91CEF3003210FD /* Shining_effect.frag */,
 				87916A681B91D562003210FD /* Hologram_effect.frag */,
+				870A55B41B958EBD0079788B /* Invisible_effect.frag */,
+				870A55B51B95A9FC0079788B /* Gray_effect.frag */,
+				870A55B61B95AEE30079788B /* Crayon_effect.frag */,
 				87916A6A1B92FC1B003210FD /* Swell.frag */,
 			);
 			name = Shaders;

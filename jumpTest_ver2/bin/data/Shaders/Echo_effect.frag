@@ -9,5 +9,11 @@ void main() {
     vec4 col_disp = texture2DRect(texture, pos);
     vec4 col_past = texture2DRect(u_effect, pos);
     
-    gl_FragColor = (col_disp + col_past * 9.0) / 10.0;
+    float l = length(col_disp.rgb);
+    
+    vec4 col_pink = vec4(l, l, l, col_disp.a) * vec4(1.0, 0.6, 0.9, 1.0);
+    
+    vec4 color = (col_pink + col_past * 15.0) / 16.0;
+    
+    gl_FragColor = color;
 }

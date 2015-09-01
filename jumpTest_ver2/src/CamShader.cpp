@@ -7,10 +7,15 @@ CamShader::CamShader() {
 
 // setup
 void CamShader::setup() {
+    // setup
     camWidth    = 640;
     camHeight   = 480;
     isEffect    = false;
     effectNum   = 0;
+    
+    // SoundPlayer
+    hologramSE.loadSound("SE/hologram.mp3");
+    hologramSE.setLoop(true);
     
     //　カメラの初期設定
     camera.setVerbose(true);
@@ -41,30 +46,18 @@ void CamShader::shaderSetup() {
     // シェーダの設定
     chromaKey.load("", "Shaders/Chroma_key.frag");
     composition.load("", "Shaders/Composition.frag");
+    // エフェクト
     effect[0].load("", "Shaders/Echo_effect.frag");
     effect[1].load("", "Shaders/Shining_effect.frag");
     effect[2].load("", "Shaders//Hologram_effect.frag");
+    effect[3].load("", "Shaders/Invisible_effect.frag");
+    effect[4].load("", "Shaders/Gray_effect.frag");
+    effect[5].load("", "Shaders/Crayon_effect.frag");
+    
+    // fbo
     fboChromaKey.allocate(camWidth, camHeight);
     fboComposition.allocate(camWidth, camHeight);
     fboEffect.allocate(camWidth, camHeight);
-}
-
-// update
-void CamShader::update() {
-    differPixels();
-    
-    // カメラとピクセル情報の更新
-    camera.update();
-    if ( camera.isFrameNew() ) {
-        unsigned char *pixels = camera.getPixels();
-        nowImage.loadData(pixels, camWidth, camHeight, GL_RGB);
-    }
-    
-    // シェーダの更新
-    shaderUpdate();
-    
-    // ベクトル場を弱める
-    VF.fadeField(0.8f);
 }
 
 // シェーダの更新
@@ -96,6 +89,7 @@ void CamShader::shaderUpdate() {
     effect[effectNum].setUniformTexture("u_effect", resultEffect, 1);
     effect[effectNum].setUniform2f("u_resolution", camWidth, camHeight);
     effect[effectNum].setUniform1f("u_time", ofGetFrameNum());
+    effect[effectNum].setUniform1f("u_count", effectCount);
     effect[effectNum].setUniform1f("u_random", ofRandom(1.0));
     ofRect(0, 0, camWidth, camHeight);
     effect[effectNum].end();
@@ -104,15 +98,53 @@ void CamShader::shaderUpdate() {
         resultEffect = fboEffect.getTextureReference();
     } else {
         resultEffect = fboComposition.getTextureReference();
+        hologramSE.stop();
     }
+}
+
+// update
+void CamShader::update() {    
+    // カメラのピクセルの差分計算
+    differPixels();
+    
+    // カメラとピクセル情報の更新
+    camera.update();
+    if ( camera.isFrameNew() ) {
+        unsigned char *pixels = camera.getPixels();
+        nowImage.loadData(pixels, camWidth, camHeight, GL_RGB);
+    }
+    
+    // シェーダの更新
+    shaderUpdate();
+    
+    // ベクトル場を弱める
+    VF.fadeField(0.8f);
 }
 
 // draw
 void CamShader::draw(float x, float y) {
     if ( !isEffect ) {
+        effectCount = 0;
+        ofSetColor(255);
         fboComposition.draw(x, y);
     } else {
+        effectCount ++;
+        int alpha = effectCount * 10;
+        if ( alpha > 255 ) {
+            alpha = 255;
+        }
+        if ( effectCount > 800 ) {
+            alpha = MAX(abs(255*sin((float)effectCount * 0.15)), 1000 - effectCount);
+            if ( effectCount > 1000 ) {
+                isEffect = false;
+            }
+        }
+        ofEnableAlphaBlending();
+        ofSetColor(255, 255 - alpha);
+        fboComposition.draw(x, y);
+        ofSetColor(255, alpha);
         fboEffect.draw(x, y);
+        ofDisableAlphaBlending();
     }
     
     /*ofSetColor(255, 50, 150);
@@ -151,9 +183,13 @@ void CamShader::differPixels() {
     }
 }
 
+// エフェクトを決定する
 void CamShader::decisionEffect() {
-    int num = (int)ofRandom(0, EFFECT_NUM);
+    int num = (int)ofRandom(0, EFFECT_SUM);
     effectNum = num;
+    if ( effectNum == 2 ) {
+        hologramSE.play();
+    }
 }
 
 CamShader::~CamShader() {

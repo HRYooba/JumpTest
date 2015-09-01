@@ -3,17 +3,20 @@
 #include "ofMain.h"
 #include "VectorField.h"
 
-#define EFFECT_NUM 3
+#define EFFECT_SUM 6
 
 class CamShader {
 public:
     int       camWidth; // カメラのwidth
     int       camHeight; // カメラのheight
     int       effectNum;
+    int       effectCount;
     bool      isEffect;
     
     unsigned char *pixelsBuffer; //1フレーム前のpixel情報を保存するところ
-
+    
+    // SE
+    ofSoundPlayer hologramSE;
     // テクスチャ類
     ofTexture   nowImage; // 現在のカメラを保存するテクスチャ
     ofTexture   pastImage; // 過去のカメラを保存するテクスチャ
@@ -23,14 +26,13 @@ public:
     // シェーダ
     ofShader    chromaKey; // クロマキー合成するシャーだ
     ofShader    composition; // 背景合成のシェーダ
-    ofShader    effect[EFFECT_NUM]; // エフェクト
+    ofShader    effect[EFFECT_SUM]; // エフェクト
     // Fbo
     ofFbo       fboChromaKey;
     ofFbo       fboComposition;
     ofFbo       fboEffect;
     //　カメラ
     ofVideoGrabber camera;
-    
     // ベクトル場
     VectorField VF;
     

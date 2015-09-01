@@ -8,10 +8,10 @@ VectorField::VectorField(){
 //ベクトル場の初期化
 void VectorField::setupField(int innerW, int innerH, int outerW, int outerH){
     
-    fieldWidth			= innerW;
-    fieldHeight			= innerH;
-    externalWidth		= outerW;
-    externalHeight		= outerH;
+    fieldWidth     = innerW;
+    fieldHeight    = innerH;
+    externalWidth  = outerW;
+    externalHeight = outerH;
     
     field.clear();
     
@@ -92,18 +92,18 @@ ofVec2f VectorField::getForceFromPos(float xpos, float ypos){
 //外向きの力を加える (噴出)
 void VectorField::addOutwardCircle(float x, float y, float radius, float strength){
     
-    float pctx			= x / (float)externalWidth;
-    float pcty			= y / (float)externalHeight;
-    float radiusPct		= radius / (float)externalWidth;
+    float pctx        = x / (float)externalWidth;
+    float pcty        = y / (float)externalHeight;
+    float radiusPct   = radius / (float)externalWidth;
+
+    int fieldPosX     = (int)(pctx * (float)fieldWidth);
+    int fieldPosY     = (int)(pcty * (float)fieldHeight);
+    float fieldRadius = (float)(radiusPct * fieldWidth);
     
-    int fieldPosX		= (int)(pctx * (float)fieldWidth);
-    int fieldPosY		= (int)(pcty * (float)fieldHeight);
-    float fieldRadius	= (float)(radiusPct * fieldWidth);
-    
-    int startx	= MAX(fieldPosX - fieldRadius, 0);
-    int starty	= MAX(fieldPosY - fieldRadius, 0);
-    int endx	= MIN(fieldPosX + fieldRadius, fieldWidth);
-    int endy	= MIN(fieldPosY + fieldRadius, fieldHeight);
+    int startx = MAX(fieldPosX - fieldRadius, 0);
+    int starty = MAX(fieldPosY - fieldRadius, 0);
+    int endx   = MIN(fieldPosX + fieldRadius, fieldWidth);
+    int endy   = MIN(fieldPosY + fieldRadius, fieldHeight);
     
     for (int i = startx; i < endx; i++){
         for (int j = starty; j < endy; j++){

@@ -51,7 +51,7 @@ void main() {
         }
     }
     
-    vec4 color = (col_disp + sum * 9.0) / 10.0 * vec4(1.04, 1.04, 0.0, 1.0);
+    vec4 color = (col_disp * 1.0 + sum * 9.0) / 10.0 * vec4(1.09, 1.08, 1.04, 1.0);
     
     gl_FragColor = color;
 }

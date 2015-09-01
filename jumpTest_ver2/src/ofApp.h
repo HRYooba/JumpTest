@@ -3,14 +3,13 @@
 #include "ofMain.h"
 #include "ofxOsc.h"
 #include "ofxBox2D.h"
-
 #include "BackImage.h"
 #include "CamShader.h"
 #include "Charactor.h"
 #include "Water.h"
 
-#define PORT 5555//自分のポート番号
-#define USE_DISPAY
+#define PORT 5555 //自分のポート番号
+//#define USE_DISPLAY // コメントアウトを外すとフルスクリーンになり画面が横になる
 
 class ofApp : public ofBaseApp{
     
@@ -36,16 +35,15 @@ public:
     bool    isJamp; // ジャンプしたかのフラグ
     
     ofImage outImg;
+    ofSoundPlayer itemSE;
     
     // osc
-    //void dumpOSC(ofxOscMessage m);
     ofxOscReceiver receiver;
     
-    BackImage backImg;
     CamShader camShader;
-    Charactor chara;
-    Water water;
-    
+    BackImage back;
+    //Charactor chara;
+    //Water water;
     ofxBox2d world;
     vector<ofPtr<ofxBox2dCircle> > circles;
 };
