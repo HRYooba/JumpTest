@@ -14,11 +14,20 @@ void ofApp::setup(){
     fadeinCount = 40;
     isStart     = false;
     isJamp      = false;
-    isFlash     = false;
+    isPic     = false;
+    
+    // 画像
+    for ( int i=0; i<3; i++ ) {
+        countImg[i].loadImage("Image/count" + ofToString(i+1) + ".png");
+    }
+    joney.loadImage("Image/joney2.png");
     
     // 音
     itemSE.loadSound("SE/item.mp3");
     flashSE.loadSound("SE/flash.mp3");
+    for ( int i=0; i<3; i++ ) {
+        countSE[i].loadSound("SE/count" + ofToString(i+1) + ".mp3");
+    }
     
     // 各クラス
     camShader.setup();
@@ -101,7 +110,7 @@ void ofApp::update(){
      ofRemove(circles, ofxBox2dBaseShape::shouldRemoveOffScreen);
      world.update();
      */
-    if ( !isFlash ) {
+    if ( !isPic ) {
         camShader.update();
         back.update();
     } else {
@@ -109,20 +118,21 @@ void ofApp::update(){
     }
     
     if ( back.takePicture ) {
+        flashSE.play();
         outImg.grabScreen((width - width/2)/2, 0, ofGetWidth()/2, ofGetHeight());
         string imgName =  "img" + ofToString(imgNum) + ".png";
         outImg.saveImage("/Users/oobahiroya/Desktop/SavedImage/" + imgName, OF_IMAGE_QUALITY_BEST);
         imgNum ++;
         back.takePicture = false;
-        isFlash          = true;
-        flashCount       = 0;
+        isPic          = true;
+        picCount       = 0;
         back.setup();
     }
 }
 
 //--------------------------------------------------------------
 void ofApp::draw(){
-    if ( !isFlash ) {
+    if ( !isPic ) {
         ofPushMatrix();
         ofTranslate((width - width/2)/2, height/2);
         ofScale(0.5, 0.5);
@@ -152,47 +162,62 @@ void ofApp::draw(){
         
         // 宇宙飛行士
         if ( back.takePicCount > 0 && back.takePicCount < 240 ) {
-            ofSetColor(255, 255 * sin(PI/400.0 * (float)back.takePicCount));
-            back.joney.draw(width/2 - back.joney.width/2 + 150 * sin(back.takePicCount/10.0),
-                            -back.joney.height/2 + 200 * sin(back.takePicCount/22.0));
+            float x = (width - width/2)*3/2 - sqrt(back.takePicCount)*100;
+            if ( x <= (width - width/2)/2 ) {
+                x = (width - width/2)/2;
+            }
+            ofSetColor(255, 255);
+            joney.draw(x, -joney.height + 100);
         }
         // カウントダウン
         ofSetColor(255, 255);
         if ( back.takePicCount >= 60  && back.takePicCount < 120) {
-            back.countImg[2].draw(width/2 - back.countImg[2].width/2, -back.countImg[2].height/2);
+            if ( back.takePicCount == 60 ) {
+                countSE[2].play();
+            }
+            countImg[2].draw(width/2 - countImg[2].width/2, -countImg[2].height/2);
         }
         if ( back.takePicCount >= 120  && back.takePicCount < 180) {
-            back.countImg[1].draw(width/2 - back.countImg[1].width/2, -back.countImg[1].height/2);
+            if ( back.takePicCount == 120 ) {
+                countSE[1].play();
+            }
+            countImg[1].draw(width/2 - countImg[1].width/2, -countImg[1].height/2);
         }
         if ( back.takePicCount >= 180  && back.takePicCount < 240) {
-            back.countImg[0].draw(width/2 - back.countImg[0].width/2, -back.countImg[0].height/2);
+            if ( back.takePicCount == 180 ) {
+                countSE[0].play();
+            }
+            countImg[0].draw(width/2 - countImg[0].width/2, -countImg[0].height/2);
         }
         ofDisableBlendMode();
         ofPopMatrix();
     } else {
-        if ( flashCount == 0 ) {
+        // フラッシュ
+        /*if ( picCount == 0 ) {
             flashSE.play();
-        }
-        if ( flashCount < 180) {
-            ofEnableBlendMode(OF_BLENDMODE_ADD);
-            ofSetColor(255, 255*sin(flashCount));
+        }*/
+        if ( picCount < 180) {
+           /* ofEnableBlendMode(OF_BLENDMODE_ADD);
+            ofSetColor(255, 255*sin(picCount));
             ofRect(0, 0, width, height);
-            ofDisableBlendMode();
-            flashCount += 30;
-        } else if (flashCount >= 180 && flashCount < 380) {
+            ofDisableBlendMode();*/
+            ofSetColor(0);
+            ofRect(0, 0, width, height);
+            picCount += 30;
+        } else if (picCount >= 180 && picCount < 380) {
             ofEnableBlendMode(OF_BLENDMODE_ALPHA);
-            ofSetColor(255, flashCount*1.5 - 180);
+            ofSetColor(255, picCount*1.5 - 180);
             outImg.draw((width - width/2)/2, 0);
             ofDisableBlendMode();
-            flashCount ++;
+            picCount ++;
         } else {
-            isFlash = false;
+            isPic = false;
         }
     }
-    // 消してもいいやつ
+    // サイドを消してる
     ofSetColor(0);
     ofRect(0, 0, (width - width/2)/2, height);
-    ofRect((width - width/2)*2, 0, 10000, height);
+    ofRect((width - width/2)*3/2, 0, width - (width - width/2)*3/2, height);
 }
 
 //--------------------------------------------------------------

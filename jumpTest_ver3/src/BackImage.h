@@ -17,8 +17,7 @@ public:
     
     // 画像
     ofImage img; // 背景の画像
-    ofImage countImg[3]; // カウントの画像
-    ofImage joney; // 宇宙飛行士の画像
+    
     //音
     ofSoundPlayer jumpSE; // ジャンプ音
     ofSoundPlayer fallSE;

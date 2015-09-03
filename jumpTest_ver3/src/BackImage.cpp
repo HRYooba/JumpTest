@@ -8,10 +8,6 @@ BackImage::BackImage() {
 void BackImage::setup() {
     // 読み込む画像の設定
     img.loadImage("Image/back.png");
-    for ( int i=0; i<3; i++ ) {
-        countImg[i].loadImage("Image/count" + ofToString(i) + ".png");
-    }
-    joney.loadImage("Image/joney.png");
     // soundPlayer
     jumpSE.loadSound("SE/jump.mp3");
     fallSE.loadSound("SE/fall.mp3");
