@@ -8,40 +8,34 @@ void ofApp::setup(){
     // setup
     ofSetFrameRate(60);
     ofBackground(0);
-    width  = ofGetWidth();
-    height = ofGetHeight();
+    width       = ofGetWidth();
+    height      = ofGetHeight();
+    imgNum      = 0;
+    fadeinCount = 40;
+    isStart     = false;
+    isJamp      = false;
+    isFlash     = false;
     
     // 音
     itemSE.loadSound("SE/item.mp3");
+    flashSE.loadSound("SE/flash.mp3");
     
     // 各クラス
     camShader.setup();
-#ifdef USE_DISPLAY
-    back.setup(true);
-#else 
-    back.setup(false);
-#endif
+    back.setup();
     
     // box2D
     world.init();
     world.setFPS(60.0);
-#ifdef USE_DISPLAY
-    world.setGravity(-10, 0);
-#else
     world.setGravity(0, 10);
-#endif
     
     // 画面の比
     ratioWidth  = ofGetWidth() / (float)camShader.camWidth;
     ratioHeight = ofGetHeight() / (float)camShader.camHeight;
-    printf("width : ");
-    printf("%d\n", width);
-    printf("height : ");
-    printf("%d\n", height);
-    printf("ratioWidth : ");
-    printf("%f\n", ratioWidth);
-    printf("ratioHeight : ");
-    printf("%f\n", ratioHeight);
+    printf("width : %d\n", width);
+    printf("height : %d\n", height);
+    printf("ratioWidth : %f\n", ratioWidth);
+    printf("ratioHeight : %f\n", ratioHeight);
 }
 
 //--------------------------------------------------------------
@@ -50,12 +44,24 @@ void ofApp::update(){
     // osc---------------------------------------------
     while ( receiver.hasWaitingMessages() )
     {
-        printf("JUMP!!\n");
         //次のメッセージを取得
         ofxOscMessage m;
         receiver.getNextMessage( &m );
         
+        if ( m.getAddress() == "/getOn" ) {
+            printf("\n   on\n");
+            fadeinCount = 40;
+            isStart       = true;
+        }
+        
+        if ( m.getAddress() == "/getOff" ) {
+            printf("\n   off\n");
+            fadeinCount = 40;
+            isStart       = false;
+        }
+        
         if ( m.getAddress() == "/jump" ){
+            printf("\n   JUMP\n");
             isJamp = true;
             back.jamping(m.getArgAsInt32(0));
             back.copyFlag(isJamp);
@@ -63,109 +69,138 @@ void ofApp::update(){
     }
     // ------------------------------------------------
     
-    // もし球のある座標に力があれば球を消す
-    for ( int i=0; i<circles.size(); i++ ) {
-        ofVec2f frc = camShader.VF.getForceFromPos(circles[i].get()->getPosition().x, circles[i].get()->getPosition().y);
-        if ( frc.length() > 0.01 ) {
-            circles[i].get()->setPosition(-1000, height+100);
-            camShader.decisionEffect();
-            itemSE.play();
-            camShader.isEffect = true;
+    if ( isStart ) {
+        if ( fadeinCount >= 255 ) {
+            fadeinCount = 255;
+        } else {
+            fadeinCount += 10;
         }
     }
-    // 球を発生させている
-    /*if ( ofGetFrameNum()%300 == 100 && !camShader.isEffect ) {
-        shared_ptr<ofxBox2dCircle> circle = shared_ptr<ofxBox2dCircle>(new ofxBox2dCircle);
-        circle.get()->setPhysics(1, 0.5, 1);
-        float size = ofRandom(10, 15);
-#ifdef USE_DISPLAY
-        circle.get()->setup(world.getWorld(), height, ofRandom(camShader.camHeight/3, camShader.camHeight*2/3), 15);
-#else
-        circle.get()->setup(world.getWorld(), ofRandom(camShader.camWidth/3, camShader.camWidth*2/3), 10, 15);
-#endif
-        circles.push_back(circle);
-    }*/
     
-    // 球が外に出たらvector配列から消去
-    ofRemove(circles, ofxBox2dBaseShape::shouldRemoveOffScreen);
-    
-    world.update();
-    camShader.update();
-#ifdef USE_DISPLAY
-    back.update(true);
-#else
-    back.update(false);
-#endif
-
+    /*
+     // もし球のある座標に力があれば球を消す
+     for ( int i=0; i<circles.size(); i++ ) {
+     ofVec2f frc = camShader.VF.getForceFromPos(circles[i].get()->getPosition().x, circles[i].get()->getPosition().y);
+     if ( frc.length() > 0.01 ) {
+     circles[i].get()->setPosition(-10000, height+10000);
+     camShader.decisionEffect();
+     itemSE.play();
+     camShader.isEffect = true;
+     }
+     }
+     // 球を発生させている
+     if ( ofGetFrameNum()%300 == 100 && !camShader.isEffect ) {
+     shared_ptr<ofxBox2dCircle> circle = shared_ptr<ofxBox2dCircle>(new ofxBox2dCircle);
+     circle.get()->setPhysics(1, 0.5, 1);
+     float size = ofRandom(10, 15);
+     circle.get()->setup(world.getWorld(), ofRandom(camShader.camWidth/3, camShader.camWidth*2/3), -height/2 + 10, 15);
+     circles.push_back(circle);
+     }
+     
+     // 球が外に出たらvector配列から消去
+     ofRemove(circles, ofxBox2dBaseShape::shouldRemoveOffScreen);
+     world.update();
+     */
+    if ( !isFlash ) {
+        camShader.update();
+        back.update();
+    } else {
+        back.init();
+    }
     
     if ( back.takePicture ) {
-        outImg.grabScreen(0, 0, ofGetWidth(), ofGetHeight());
+        outImg.grabScreen((width - width/2)/2, 0, ofGetWidth()/2, ofGetHeight());
         string imgName =  "img" + ofToString(imgNum) + ".png";
         outImg.saveImage("/Users/oobahiroya/Desktop/SavedImage/" + imgName, OF_IMAGE_QUALITY_BEST);
         imgNum ++;
         back.takePicture = false;
+        isFlash          = true;
+        flashCount       = 0;
+        back.setup();
     }
 }
 
 //--------------------------------------------------------------
 void ofApp::draw(){
-    
-#ifdef USE_DISPLAY
-    ofPushMatrix();
-    ofRotate(-90);
-    ofTranslate(-height, width);
-    ofSetColor(255);
-    back.draw(0, 0, true);
-    ofPopMatrix();
-#else
-    ofSetColor(255);
-    back.draw(0, height, false);
-#endif
-    
-    // size(640, 480)のカメラ関連のものを画面の大きさに合わせる
-    ofEnableBlendMode(OF_BLENDMODE_ALPHA);
-#ifdef USE_DISPLAY
-    ofPushMatrix();
-    ofScale(-ratioWidth, ratioWidth);
-    ofTranslate(-(camShader.camWidth + (width/ratioHeight-camShader.camWidth)), 0);
-    ofSetColor(255);
-    camShader.draw(0, 0);
-    for ( int i=0; i<circles.size(); i++ ) {
-        ofSetColor(255, 50, 150);
-        float x = circles[i].get()->getPosition().x;
-        float y = circles[i].get()->getPosition().y;
-        float r = circles[i].get()->getRadius();
-        ofCircle(x, y, r);
+    if ( !isFlash ) {
+        ofPushMatrix();
+        ofTranslate((width - width/2)/2, height/2);
+        ofScale(0.5, 0.5);
+        ofPushMatrix();
+        ofTranslate(0, height);
+        ofSetColor(255);
+        back.draw(0, 0);
+        ofPopMatrix();
+        
+        // size(640, 480)のカメラ関連のものを画面の大きさに合わせる
+        ofEnableBlendMode(OF_BLENDMODE_ALPHA);
+        ofPushMatrix();
+        ofScale(-ratioWidth, ratioWidth);
+        ofTranslate(-(camShader.camWidth + (width/ratioWidth-camShader.camWidth)), 0);
+        ofScale(1.5, 1.5); //-----------
+        ofTranslate(0, -200); //---------------
+        ofSetColor(255, fadeinCount);
+        camShader.draw(0, 0);
+        /* for ( int i=0; i<circles.size(); i++ ) {
+         ofSetColor(255, 50, 150);
+         float x = circles[i].get()->getPosition().x;
+         float y = circles[i].get()->getPosition().y;
+         float r = circles[i].get()->getRadius();
+         ofCircle(x, y, r);
+         }*/
+        ofPopMatrix();
+        
+        // 宇宙飛行士
+        if ( back.takePicCount > 0 && back.takePicCount < 240 ) {
+            ofSetColor(255, 255 * sin(PI/400.0 * (float)back.takePicCount));
+            back.joney.draw(width/2 - back.joney.width/2 + 150 * sin(back.takePicCount/10.0),
+                            -back.joney.height/2 + 200 * sin(back.takePicCount/22.0));
+        }
+        // カウントダウン
+        ofSetColor(255, 255);
+        if ( back.takePicCount >= 60  && back.takePicCount < 120) {
+            back.countImg[2].draw(width/2 - back.countImg[2].width/2, -back.countImg[2].height/2);
+        }
+        if ( back.takePicCount >= 120  && back.takePicCount < 180) {
+            back.countImg[1].draw(width/2 - back.countImg[1].width/2, -back.countImg[1].height/2);
+        }
+        if ( back.takePicCount >= 180  && back.takePicCount < 240) {
+            back.countImg[0].draw(width/2 - back.countImg[0].width/2, -back.countImg[0].height/2);
+        }
+        ofDisableBlendMode();
+        ofPopMatrix();
+    } else {
+        if ( flashCount == 0 ) {
+            flashSE.play();
+        }
+        if ( flashCount < 180) {
+            ofEnableBlendMode(OF_BLENDMODE_ADD);
+            ofSetColor(255, 255*sin(flashCount));
+            ofRect(0, 0, width, height);
+            ofDisableBlendMode();
+            flashCount += 30;
+        } else if (flashCount >= 180 && flashCount < 380) {
+            ofEnableBlendMode(OF_BLENDMODE_ALPHA);
+            ofSetColor(255, flashCount*1.5 - 180);
+            outImg.draw((width - width/2)/2, 0);
+            ofDisableBlendMode();
+            flashCount ++;
+        } else {
+            isFlash = false;
+        }
     }
-    ofPopMatrix();
-#else
-    ofPushMatrix();
-    ofScale(-ratioWidth, ratioHeight);
-    ofTranslate(-camShader.camWidth, 0);
-    ofSetColor(255);
-    camShader.draw(0, 0);
-    for ( int i=0; i<circles.size(); i++ ) {
-        ofSetColor(255, 50, 150);
-        float x = circles[i].get()->getPosition().x;
-        float y = circles[i].get()->getPosition().y;
-        float r = circles[i].get()->getRadius();
-        ofCircle(x, y, r);
-    }
-    ofPopMatrix();
-#endif
-    ofDisableBlendMode();
+    // 消してもいいやつ
+    ofSetColor(0);
+    ofRect(0, 0, (width - width/2)/2, height);
+    ofRect((width - width/2)*2, 0, 10000, height);
 }
 
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key){
     if ( key == ' ' ) {
         isJamp = true;
-        back.jamping(180);
+        back.jamping(600);
         back.copyFlag(isJamp);
-    }
-    if ( key == 's' ) {
-        outImg.grabScreen(0, 0, ofGetWidth(), ofGetHeight());
-        outImg.saveImage("/Users/oobahiroya/Desktop/SavedImage/img.png", OF_IMAGE_QUALITY_BEST);
     }
     if ( key == '1' ) {
         camShader.isEffect = camShader.isEffect ? false : true;

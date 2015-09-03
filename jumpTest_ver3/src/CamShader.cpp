@@ -125,7 +125,6 @@ void CamShader::update() {
 void CamShader::draw(float x, float y) {
     if ( !isEffect ) {
         effectCount = 0;
-        ofSetColor(255);
         fboComposition.draw(x, y);
     } else {
         effectCount ++;
