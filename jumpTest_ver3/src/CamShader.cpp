@@ -105,7 +105,7 @@ void CamShader::shaderUpdate() {
 // update
 void CamShader::update() {    
     // カメラのピクセルの差分計算
-    differPixels();
+    //differPixels();
     
     // カメラとピクセル情報の更新
     camera.update();
@@ -118,7 +118,7 @@ void CamShader::update() {
     shaderUpdate();
     
     // ベクトル場を弱める
-    VF.fadeField(0.8f);
+    //VF.fadeField(0.8f);
 }
 
 // draw
@@ -138,12 +138,12 @@ void CamShader::draw(float x, float y) {
                 isEffect = false;
             }
         }
-        ofEnableAlphaBlending();
+//        ofEnableAlphaBlending();
         ofSetColor(255, 255 - alpha);
         fboComposition.draw(x, y);
         ofSetColor(255, alpha);
         fboEffect.draw(x, y);
-        ofDisableAlphaBlending();
+//        ofDisableAlphaBlending();
     }
 }
 

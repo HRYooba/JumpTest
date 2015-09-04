@@ -32,29 +32,31 @@ public:
     
     int     width; // 画面の幅
     int     height; // 画面の高さ
-    int     imgNum; // 写真の番号
     int     fadeinCount; // フェードインするカウント
     int     picCount; // 撮った写真を表示する時間
     float   ratioWidth; // 画面の大きさ / カメラの大きさ
     float   ratioHeight; // 画面の大きさ / カメラの大きさ
     bool    isJamp; // ジャンプしたかのフラグ
     bool    isStart; // スタート
-    bool    isPic; // フラッシュ
+    bool    isPic; // 撮った写真を表示するか
     
-    ofImage outImg; // 写真
-    ofImage countImg[3]; // カウントの画像
-    ofImage joney; // 宇宙飛行士の画像
+    // 画像
+    ofImage     outImg; // 写真
+    ofImage     countImg[3]; // カウントの画像
+    ofImage     joney; // 宇宙飛行士の画像
     
-    ofSoundPlayer itemSE;
-    ofSoundPlayer flashSE;
-    ofSoundPlayer countSE[3];
+    // 音
+    ofSoundPlayer   itemSE;
+    ofSoundPlayer   flashSE;
+    ofSoundPlayer   countSE[3];
     
     // osc
     ofxOscReceiver receiver;
     
-    CamShader camShader;
-    BackImage back;
+    // クラス
+    CamShader   camShader;
+    BackImage   back;
     
-    ofxBox2d world;
+    ofxBox2d    world;
     vector<ofPtr<ofxBox2dCircle> > circles;
 };

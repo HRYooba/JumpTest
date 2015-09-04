@@ -11,7 +11,7 @@ void BackImage::setup() {
     // soundPlayer
     jumpSE.loadSound("SE/jump.mp3");
     fallSE.loadSound("SE/fall.mp3");
-    
+    // 初期設定
     init();
 }
 
@@ -87,7 +87,7 @@ void BackImage::takePictureMode(bool isGoal) {
         if ( position <= -ofGetHeight() * 2 - 6000) {
             position = -ofGetHeight() * 2 -6000;
         }
-        if ( takePicCount == 260 ) {
+        if ( takePicCount == 240 ) {
             takePicture = true;
         }
         takePicCount ++;

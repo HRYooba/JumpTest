@@ -10,11 +10,10 @@ void ofApp::setup(){
     ofBackground(0);
     width       = ofGetWidth();
     height      = ofGetHeight();
-    imgNum      = 0;
     fadeinCount = 40;
     isStart     = false;
     isJamp      = false;
-    isPic     = false;
+    isPic       = false;
     
     // 画像
     for ( int i=0; i<3; i++ ) {
@@ -78,6 +77,7 @@ void ofApp::update(){
     }
     // ------------------------------------------------
     
+    // もしスタートしたらファードインする
     if ( isStart ) {
         if ( fadeinCount >= 255 ) {
             fadeinCount = 255;
@@ -110,6 +110,8 @@ void ofApp::update(){
      ofRemove(circles, ofxBox2dBaseShape::shouldRemoveOffScreen);
      world.update();
      */
+    
+    //　撮った写真を表示してないなら
     if ( !isPic ) {
         camShader.update();
         back.update();
@@ -117,15 +119,16 @@ void ofApp::update(){
         back.init();
     }
     
+    // 写真を撮る
     if ( back.takePicture ) {
         flashSE.play();
         outImg.grabScreen((width - width/2)/2, 0, ofGetWidth()/2, ofGetHeight());
-        string imgName =  "img" + ofToString(imgNum) + ".png";
-        outImg.saveImage("/Users/oobahiroya/Desktop/SavedImage/" + imgName, OF_IMAGE_QUALITY_BEST);
-        imgNum ++;
+        string imgName =  ofToString(ofGetYear()) + "_" + ofToString(ofGetMonth()) + ":" + ofToString(ofGetDay()) + "_" + ofToString(ofGetHours()) + "_" + ofToString(ofGetMinutes()) + "_" + ofToString(ofGetSeconds()) + ".png";
+        //outImg.saveImage("/Users/oobahiroya/Desktop/SavedImage/" + imgName, OF_IMAGE_QUALITY_BEST);
+        outImg.saveImage("/Users/oobahiroya/Google ドライブ/SaveImage/" + imgName, OF_IMAGE_QUALITY_BEST);
         back.takePicture = false;
-        isPic          = true;
-        picCount       = 0;
+        isPic            = true;
+        picCount         = 0;
         back.setup();
     }
 }
@@ -133,6 +136,7 @@ void ofApp::update(){
 //--------------------------------------------------------------
 void ofApp::draw(){
     if ( !isPic ) {
+        // 背景
         ofPushMatrix();
         ofTranslate((width - width/2)/2, height/2);
         ofScale(0.5, 0.5);
@@ -143,6 +147,7 @@ void ofApp::draw(){
         ofPopMatrix();
         
         // size(640, 480)のカメラ関連のものを画面の大きさに合わせる
+        //　カメラ
         ofEnableBlendMode(OF_BLENDMODE_ALPHA);
         ofPushMatrix();
         ofScale(-ratioWidth, ratioWidth);
@@ -192,15 +197,8 @@ void ofApp::draw(){
         ofDisableBlendMode();
         ofPopMatrix();
     } else {
-        // フラッシュ
-        /*if ( picCount == 0 ) {
-            flashSE.play();
-        }*/
+        // 撮った写真を表示
         if ( picCount < 180) {
-           /* ofEnableBlendMode(OF_BLENDMODE_ADD);
-            ofSetColor(255, 255*sin(picCount));
-            ofRect(0, 0, width, height);
-            ofDisableBlendMode();*/
             ofSetColor(0);
             ofRect(0, 0, width, height);
             picCount += 30;
@@ -285,9 +283,7 @@ void ofApp::mouseDragged(int x, int y, int button){
 
 //--------------------------------------------------------------
 void ofApp::mousePressed(int x, int y, int button){
-    if (button == 0) {
-        camShader.pastUpdate();
-    }
+    
 }
 
 //--------------------------------------------------------------
