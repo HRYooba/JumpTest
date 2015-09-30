@@ -1004,7 +1004,7 @@
 					"-lpthread",
 					"-mtune=native",
 				);
-				SDKROOT = macosx;
+				SDKROOT = macosx10.11;
 			};
 			name = Debug;
 		};
@@ -1057,7 +1057,7 @@
 					"-lpthread",
 					"-mtune=native",
 				);
-				SDKROOT = macosx;
+				SDKROOT = macosx10.11;
 			};
 			name = Release;
 		};
@@ -1144,6 +1144,7 @@
 					/Users/oobahiroya/program/openFrameworks/of_v0.8.4_osx_release/addons/ofxOpenCv/libs/opencv/lib/osx,
 				);
 				PRODUCT_NAME = jumpTest_ver3Debug;
+				SDKROOT = macosx10.11;
 				USER_HEADER_SEARCH_PATHS = ../../../addons/ofxOpenCv/libs/opencv/include/;
 				WRAPPER_EXTENSION = app;
 			};
@@ -1231,6 +1232,7 @@
 					/Users/oobahiroya/program/openFrameworks/of_v0.8.4_osx_release/addons/ofxOpenCv/libs/opencv/lib/osx,
 				);
 				PRODUCT_NAME = jumpTest_ver3;
+				SDKROOT = macosx10.11;
 				USER_HEADER_SEARCH_PATHS = ../../../addons/ofxOpenCv/libs/opencv/include/;
 				WRAPPER_EXTENSION = app;
 			};

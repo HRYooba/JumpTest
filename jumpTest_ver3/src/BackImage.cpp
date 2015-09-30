@@ -87,8 +87,10 @@ void BackImage::takePictureMode(bool isGoal) {
         if ( position <= -ofGetHeight() * 2 - 6000) {
             position = -ofGetHeight() * 2 -6000;
         }
-        if ( takePicCount == 240 ) {
-            takePicture = true;
+        if ( takePicCount > 255 ) {
+            if ( moveFlag ) {
+                takePicture = true;
+            }
         }
         takePicCount ++;
     } else {
