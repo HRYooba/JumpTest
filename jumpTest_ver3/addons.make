@@ -1,2 +1,0 @@
-ofxOsc
-ofxBox2d
