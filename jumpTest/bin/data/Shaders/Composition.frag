@@ -1,5 +1,4 @@
 uniform sampler2DRect u_nowImage; //現在のカメラ画像
-uniform sampler2DRect u_pastImage; //過去のカメラ画像
 uniform sampler2DRect u_chromaKey; //クロマキー合成した画像
 
 void main() {

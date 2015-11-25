@@ -25,7 +25,11 @@ void ofApp::setup(){
     itemSE.loadSound("SE/item.mp3");
     flashSE.loadSound("SE/flash.mp3");
     for ( int i=0; i<3; i++ ) {
-        countSE[i].loadSound("SE/count" + ofToString(i+1) + ".mp3");
+        countSE[i].loadSound("SE/count" + ofToString(i+4) + ".mp3");
+        countSE[i].setSpeed(2.4);
+        countSE[i].setVolume(0.8);
+        countSE[i].setLoop(false);
+        isCountSE[i] = false;
     }
     
     // 各クラス
@@ -40,7 +44,7 @@ void ofApp::setup(){
     // 画面の比
     ratioWidth  = ofGetWidth() / (float)cam.camWidth;
     ratioHeight = ofGetHeight() / (float)cam.camHeight;
-    printf("width : %d\n", width);
+    printf("\nwidth : %d\n", width);
     printf("height : %d\n", height);
     printf("ratioWidth : %f\n", ratioWidth);
     printf("ratioHeight : %f\n", ratioHeight);
@@ -48,7 +52,9 @@ void ofApp::setup(){
 
 //--------------------------------------------------------------
 void ofApp::update(){
+    
     isJamp = false;
+    
     // osc---------------------------------------------
     while ( receiver.hasWaitingMessages() )
     {
@@ -59,15 +65,35 @@ void ofApp::update(){
         // 登ったら
         if ( m.getAddress() == "/getOn" ) {
             printf("\n------on------\n");
-            fadeinCount = 40;
-            isStart     = true;
+            fadeinCount  = 40;
+            isStart      = true;
+            jumpCount    = 0;
+            jumpLastTime = 0;
+            jumpBetween  = 0;
+            jumpSum      = 0;
+            jumpAvarage  = 0;
+            startShutter = 0;
+            for ( int i=0; i<3; i++ ) {
+                countSE[i].setPosition(0);
+                isCountSE[i] = false;
+            }
         }
         
         // 降りたら
         if ( m.getAddress() == "/getOff" ) {
             printf("\n------off------\n");
-            fadeinCount = 40;
-            isStart     = false;
+            fadeinCount  = 40;
+            isStart      = false;
+            jumpCount    = 0;
+            jumpLastTime = 0;
+            jumpBetween  = 0;
+            jumpSum      = 0;
+            jumpAvarage  = 0;
+            startShutter = 0;
+            for ( int i=0; i<3; i++ ) {
+                countSE[i].setPosition(0);
+                isCountSE[i] = false;
+            }
         }
         
         // ジャンプしたら
@@ -81,13 +107,14 @@ void ofApp::update(){
                 } else {
                     jumpCount ++;
                     jumpBetween  = ofGetElapsedTimef() - jumpLastTime;
+                    testTime = jumpLastTime;
                     jumpLastTime = ofGetElapsedTimef();
                     jumpSum      += jumpBetween;
                     jumpAvarage  = jumpSum / jumpCount;
                     printf("Between : %f\n", jumpBetween);
                     printf("Average : %f\n", jumpAvarage);
                 }
-                if ( takePicCount > 240 && startShutter == 0 ) {
+                if ( jumpCount == 4 && startShutter == 0 ) {
                     startShutter = ofGetElapsedTimef();
                 }
             }
@@ -109,6 +136,10 @@ void ofApp::update(){
         jumpSum      = 0;
         jumpAvarage  = 0;
         startShutter = 0;
+        for ( int i=0; i<3; i++ ) {
+            countSE[i].setPosition(0);
+            isCountSE[i] = false;
+        }
     }
     
     //　撮った写真を表示してないなら
@@ -123,6 +154,10 @@ void ofApp::update(){
         jumpSum      = 0;
         jumpAvarage  = 0;
         startShutter = 0;
+        for ( int i=0; i<3; i++ ) {
+            countSE[i].setPosition(0);
+            isCountSE[i] = false;
+        }
     }
     
     // 写真を撮る
@@ -130,20 +165,18 @@ void ofApp::update(){
         if ( startShutter != 0 ) {
             float start = ofGetElapsedTimef() - startShutter;
             printf("start : %f\n", start);
-            if ( start >= jumpAvarage/4.0 ) {
-                printf("\n==========Shutter==========\n");
+            if ( start >= jumpAvarage / 3.0 ) {
                 flashSE.play();
-                outImg.grabScreen((width - width/2)/2, 0, width/2, height);
+                outImg.grabScreen((width - width/2)/2, 0, ofGetWidth()/2, ofGetHeight());
                 string imgName =  ofToString(ofGetYear()) + "_" + ofToString(ofGetMonth()) + ":" + ofToString(ofGetDay()) + "_" + ofToString(ofGetHours()) + "_" + ofToString(ofGetMinutes()) + "_" + ofToString(ofGetSeconds()) + ".png";
                 outImg.saveImage("/Users/oobahiroya/Google ドライブ/SaveImage/" + imgName, OF_IMAGE_QUALITY_BEST);
+                printf("\n==========Shutter==========\n");
                 isShowPic    = true;
                 showPicCount = 0;
                 back.setup();
             }
-        } else {
-            takePicCount ++;
-            printf("takePicCount : %d\n", takePicCount);
         }
+        takePicCount ++;
     } else {
         takePicCount = 0;
     }
@@ -167,42 +200,58 @@ void ofApp::draw(){
         ofEnableBlendMode(OF_BLENDMODE_ALPHA);
         ofPushMatrix();
         ofScale(-ratioWidth, ratioWidth);
-        ofTranslate(-(cam.camWidth + (width/ratioWidth-cam.camWidth)), 0);
+        //        ofTranslate(-(cam.camWidth + (width/ratioWidth-cam.camWidth)), 0);
+        ofTranslate(-cam.camWidth, 0);
         ofScale(1.5, 1.5); //-----------
-        ofTranslate(0, -200); //---------------
+        ofTranslate(0, -ratioHeight * 106.67); //---------------
         ofSetColor(255, fadeinCount);
         cam.draw(0, 0);
         ofPopMatrix();
         
-        if ( startShutter == 0 ) {
-            // 宇宙飛行士
-            if ( takePicCount > 0 ) {
-                float x = (width - width/2)*3/2 - sqrt(takePicCount)*100;
-                if ( x <= (width - width/2)/2 ) {
-                    x = (width - width/2)/2;
-                }
-                ofSetColor(255, 255);
-                joney.draw(x, -joney.height + 100);
+        // 宇宙飛行士
+        if ( takePicCount > 0 && jumpCount < 4) {
+            float x = (width - width/2) * 3/2 - sqrt(takePicCount) * 100;
+            if ( x <= (width - width/2) / 2 ) {
+                x = (width - width/2) / 2;
             }
-            // カウントダウン
             ofSetColor(255, 255);
-            if ( takePicCount >= 60  && takePicCount < 120 ) {
-                if ( takePicCount == 60 ) {
-                    countSE[2].play();
+            joney.draw(x, -joney.height + ratioHeight * 53.333);
+        }
+        // カウントダウン
+        ofSetColor(255, 255);
+        if ( back.isGoal && jumpCount < 4) {
+            if ( jumpCount == 1 ) {
+                 if ( !isCountSE[2] ) {
+                 float time = ofGetElapsedTimef() - testTime;
+                 printf("Three : %f\n", time);
+                 countSE[2].play();
+                 isCountSE[2] = true;
+                 }
+                if ( countSE[2].getIsPlaying() ) {
+                    countImg[2].draw(width/2 - countImg[2].width/2, -countImg[2].height/2);
                 }
-                countImg[2].draw(width/2 - countImg[2].width/2, -countImg[2].height/2);
             }
-            if ( takePicCount >= 120  && takePicCount < 180 ) {
-                if ( takePicCount == 120 ) {
-                    countSE[1].play();
+            if ( jumpCount == 2 ) {
+                 if ( !isCountSE[1] ) {
+                 float time = ofGetElapsedTimef() - testTime;
+                 printf("Two : %f\n", time);
+                 countSE[1].play();
+                 isCountSE[1] = true;
+                 }
+                if ( countSE[1].getIsPlaying() ) {
+                    countImg[1].draw(width/2 - countImg[2].width/2, -countImg[2].height/2);
                 }
-                countImg[1].draw(width/2 - countImg[1].width/2, -countImg[1].height/2);
             }
-            if ( takePicCount >= 180 ) {
-                if ( takePicCount == 180 ) {
-                    countSE[0].play();
+            if ( jumpCount == 3 ) {
+                 if ( !isCountSE[0] ) {
+                 float time = ofGetElapsedTimef() - testTime;
+                 printf("One : %f\n", time);
+                 countSE[0].play();
+                 isCountSE[0] = true;
+                 }
+                if ( countSE[0].getIsPlaying() ) {
+                    countImg[0].draw(width/2 - countImg[2].width/2, -countImg[2].height/2);
                 }
-                countImg[0].draw(width/2 - countImg[0].width/2, -countImg[0].height/2);
             }
         }
         ofDisableBlendMode();
@@ -232,8 +281,26 @@ void ofApp::draw(){
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key){
     if ( key == ' ' ) {
-        isJamp = true;
-        back.jamping(600);
+        printf("\n   JUMP\n");
+        isStart      = true;
+        isJamp      = true;
+        back.jamping(500);
+        if ( isStart && back.position >= -ofGetHeight() * 2 - 6000 ) {
+            if ( jumpLastTime == 0 ) {
+                jumpLastTime = ofGetElapsedTimef();
+            } else {
+                jumpCount ++;
+                jumpBetween  = ofGetElapsedTimef() - jumpLastTime;
+                jumpLastTime = ofGetElapsedTimef();
+                jumpSum      += jumpBetween;
+                jumpAvarage  = jumpSum / jumpCount;
+                printf("Between : %f\n", jumpBetween);
+                printf("Average : %f\n", jumpAvarage);
+            }
+            if ( jumpCount == 4 && startShutter == 0 ) {
+                startShutter = ofGetElapsedTimef();
+            }
+        }
     }
     if ( key == '1' ) {
         cam.isEffect = cam.isEffect ? false : true;
@@ -293,7 +360,36 @@ void ofApp::mouseDragged(int x, int y, int button){
 
 //--------------------------------------------------------------
 void ofApp::mousePressed(int x, int y, int button){
-    
+    testCount ++;
+    if ( testCount == 1 && !isCountSE[2] ) {
+        float time = ofGetElapsedTimef() - testTime;
+        printf("ThreeMouse : %f\n", time);
+        countSE[2].play();
+        isCountSE[2] = true;
+    }
+    if ( testCount == 2 && !isCountSE[1] ) {
+        float time = ofGetElapsedTimef() - testTime;
+        printf("TwoMouse : %f\n", time);
+        countSE[1].play();
+        isCountSE[2] = true;
+    }
+    if ( testCount == 3  && !isCountSE[0] ) {
+        float time = ofGetElapsedTimef() - testTime;
+        printf("OneMouse : %f\n", time);
+        countSE[0].play();
+        isCountSE[2] = true;
+    }
+    if ( testCount == 4 ) {
+        flashSE.play();
+        outImg.grabScreen((width - width/2)/2, 0, ofGetWidth()/2, ofGetHeight());
+        string imgName =  ofToString(ofGetYear()) + "_" + ofToString(ofGetMonth()) + ":" + ofToString(ofGetDay()) + "_" + ofToString(ofGetHours()) + "_" + ofToString(ofGetMinutes()) + "_" + ofToString(ofGetSeconds()) + ".png";
+        outImg.saveImage("/Users/oobahiroya/Google ドライブ/SaveImage/" + imgName, OF_IMAGE_QUALITY_BEST);
+        printf("\n==========Shutter==========\n");
+        isShowPic    = true;
+        showPicCount = 0;
+        back.setup();
+        testCount = 0;
+    }
 }
 
 //--------------------------------------------------------------

@@ -72,7 +72,8 @@ void CamShader::shaderUpdate() {
     fboComposition.begin();
     composition.begin();
     composition.setUniformTexture("u_nowImage", nowImage, 0);
-    composition.setUniformTexture("u_chromaKey", resultChromaKey, 1);
+    composition.setUniformTexture("u_pastImage", pastImage, 1);
+    composition.setUniformTexture("u_chromaKey", resultChromaKey, 2);
     ofRect(0, 0, camWidth, camHeight);
     composition.end();
     fboComposition.end();

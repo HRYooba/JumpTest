@@ -54,7 +54,6 @@ void BackImage::update() {
     }
 }
 
-
 // ゴール
 void BackImage::goal() {
     if ( position >=  -ofGetHeight() * 2) {

@@ -19,7 +19,6 @@ public:
     void setup();
     void update();
     void draw();
-    
     void keyPressed(int key);
     void keyReleased(int key);
     void mouseMoved(int x, int y );
@@ -43,9 +42,12 @@ public:
     float   jumpLastTime; // 前のジャンプしたタイミング
     float   jumpBetween; // ジャンプ間の時間
     float   startShutter; // シャッターのタイミング
+    float   testTime;
+    int     testCount;
     bool    isJamp; // ジャンプしたかのフラグ
     bool    isStart; // スタート
     bool    isShowPic; // 撮った写真を表示するか
+    bool    isCountSE[3]; // カウントダウンSEのフラグ
     
     // 画像
     ofImage     outImg; // 写真
@@ -55,7 +57,7 @@ public:
     // 音
     ofSoundPlayer   itemSE;
     ofSoundPlayer   flashSE;
-    ofSoundPlayer   countSE[3];
+    ofSoundPlayer   countSE[5];
     
     // osc
     ofxOscReceiver receiver;

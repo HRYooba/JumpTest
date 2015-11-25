@@ -1,7 +1,7 @@
 // クロマキー合成の閾値
-#define THRESH -0.05
+//#define THRESH -0.05
 // クロマキー合成の閾値
-//#define THRESH -0.15
+#define THRESH -0.08
 
 uniform sampler2DRect u_nowImage; //現在のカメラ画像
 
